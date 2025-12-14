@@ -1,14 +1,15 @@
-# TV 视频动态壁纸
+# TV 视频播放器
 
-这是一个Android TV动态壁纸应用，支持播放本地和远程视频作为壁纸，并可通过遥控器左右键切换视频。
+这是一个Android TV全屏视频播放应用，支持播放本地和远程视频，并可通过遥控器左右键切换视频。
 
 ## 功能特性
 
+- ✅ 全屏循环播放视频
 - ✅ 支持本地assets文件夹中的视频播放
 - ✅ 支持从远程API获取视频列表
 - ✅ 使用遥控器左右键切换视频
 - ✅ 视频循环播放
-- ✅ 静音播放（适合作为壁纸）
+- ✅ 静音播放
 - ✅ 自动处理播放错误并切换到下一个视频
 
 ## 项目结构
@@ -16,10 +17,8 @@
 ```
 app/src/main/
 ├── java/com/example/tv/
-│   ├── MainActivity.kt                    # 原始主Activity
-│   ├── WallpaperControlActivity.kt        # 壁纸控制Activity（新启动页）
-│   ├── service/
-│   │   └── VideoWallpaperService.kt       # 视频壁纸服务
+│   ├── MainActivity.kt                    # 原始主Activity（保留）
+│   ├── WallpaperControlActivity.kt        # 全屏视频播放Activity（主启动页）
 │   ├── manager/
 │   │   └── VideoManager.kt                # 视频管理器
 │   ├── model/
@@ -32,8 +31,8 @@ app/src/main/
 │   ├── Intergalactic-Space-Room-4K.mp4    # 本地视频1
 │   └── Samurai-Revenge-4K.mp4             # 本地视频2
 └── res/
-    └── xml/
-        └── video_wallpaper.xml            # 壁纸配置文件
+    └── values/
+        └── strings.xml                    # 字符串资源
 ```
 
 ## 使用说明
@@ -42,23 +41,19 @@ app/src/main/
 
 在Android Studio中打开项目，连接TV设备或模拟器，点击运行。
 
-### 2. 设置壁纸
+### 2. 启动应用
 
-1. 启动应用后会看到"壁纸控制"界面
-2. 点击"设置视频壁纸"按钮
-3. 在系统壁纸选择界面中选择"TV"壁纸
-4. 点击"设置壁纸"确认
+1. 应用启动后会自动进入全屏视频播放界面
+2. 应用会自动加载本地和远程视频源
+3. 视频会自动开始循环播放
 
 ### 3. 切换视频
 
-设置壁纸后，有两种方式切换视频：
+使用遥控器切换视频：
 
-**方式1：使用遥控器（推荐）**
 - 按遥控器的**左键**：切换到上一个视频
 - 按遥控器的**右键**：切换到下一个视频
-
-**方式2：使用控制界面**
-- 打开应用，在控制界面点击"← 上一个"或"下一个 →"按钮
+- 按遥控器的**返回键**：退出应用
 
 ## 视频源配置
 
@@ -112,7 +107,6 @@ API应返回以下JSON格式：
 - **ExoPlayer (Media3)** - 视频播放
 - **Retrofit** - 网络请求
 - **Coroutines** - 异步处理
-- **WallpaperService** - 动态壁纸服务
 
 ## 依赖项
 
@@ -135,8 +129,6 @@ implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
 - `INTERNET` - 访问网络获取远程视频
 - `ACCESS_NETWORK_STATE` - 检查网络状态
-- `SET_WALLPAPER` - 设置壁纸
-- `BIND_WALLPAPER` - 绑定壁纸服务
 
 ## 注意事项
 
@@ -148,27 +140,30 @@ implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
 ## 故障排除
 
-### 壁纸无法设置
+### 应用无法启动
 - 检查是否授予了必要的权限
-- 尝试重启应用
+- 查看Logcat日志获取详细错误信息
+- 尝试清除应用缓存后重新启动
 
 ### 视频无法播放
-- 检查视频格式是否支持
+- 检查视频格式是否支持（建议使用H.264编码的MP4）
 - 查看Logcat日志获取详细错误信息
 - 确保网络连接正常（远程视频）
+- 检查本地视频文件是否正确放在assets文件夹中
 
 ### 遥控器按键无响应
-- 确保壁纸已正确设置
-- 尝试使用应用内的控制按钮
 - 检查TV设备的遥控器是否正常工作
+- 尝试重启应用
+- 查看Logcat日志确认按键事件是否被正确捕获
 
 ## 开发计划
 
-- [ ] 添加视频预览功能
+- [ ] 添加视频列表显示界面
 - [ ] 支持更多视频格式
 - [ ] 添加视频过渡动画
 - [ ] 支持视频播放速度调节
-- [ ] 添加视频收藏功能
+- [ ] 添加播放进度显示
+- [ ] 支持自定义播放列表
 
 ## License
 

@@ -5,10 +5,6 @@
     <!-- 网络权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    
-    <!-- 壁纸权限 -->
-    <uses-permission android:name="android.permission.SET_WALLPAPER" />
-    <uses-permission android:name="android.permission.BIND_WALLPAPER" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -26,11 +22,12 @@
         android:theme="@style/Theme.TV"
         android:usesCleartextTraffic="true">
         
-        <!-- 主Activity - 壁纸控制界面 -->
+        <!-- 主Activity - 全屏视频播放 -->
         <activity
             android:name=".WallpaperControlActivity"
             android:exported="true"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -43,21 +40,6 @@
             android:name=".MainActivity"
             android:exported="false">
         </activity>
-        
-        <!-- 视频壁纸服务 -->
-        <service
-            android:name=".service.VideoWallpaperService"
-            android:enabled="true"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.service.wallpaper"
-                android:resource="@xml/video_wallpaper" />
-        </service>
     </application>
 
 </manifest>
