@@ -7,13 +7,22 @@ import com.example.tv.model.VideoSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+enum class PlaylistMode {
+    ALL,      // 全局列表
+    FAVORITE  // 收藏列表
+}
+
 class VideoManager(private val context: Context) {
     
     private val TAG = "VideoManager"
     private val videoList = mutableListOf<VideoSource>()
     private var currentIndex = 0
+    private var playlistMode = PlaylistMode.ALL
+    private lateinit var favoriteManager: FavoriteManager
     
     init {
+        // 初始化收藏管理器
+        favoriteManager = FavoriteManager(context)
         // 添加本地视频源
         addLocalVideos()
     }
@@ -91,33 +100,90 @@ class VideoManager(private val context: Context) {
         Log.d(TAG, "Added ${mockVideos.size} mock remote videos")
     }
     
+    // 获取当前列表中的视频
+    private fun getCurrentPlaylist(): List<VideoSource> {
+        return when (playlistMode) {
+            PlaylistMode.ALL -> videoList
+            PlaylistMode.FAVORITE -> {
+                val favoriteIds = favoriteManager.getFavoriteIds()
+                videoList.filter { favoriteIds.contains(it.id) }
+            }
+        }
+    }
+    
     fun getCurrentVideo(): VideoSource? {
-        return if (videoList.isNotEmpty()) {
-            videoList[currentIndex]
+        val playlist = getCurrentPlaylist()
+        return if (playlist.isNotEmpty() && currentIndex < playlist.size) {
+            playlist[currentIndex]
         } else {
             null
         }
     }
     
     fun getNextVideo(): VideoSource? {
-        if (videoList.isEmpty()) return null
-        currentIndex = (currentIndex + 1) % videoList.size
-        Log.d(TAG, "Switched to next video: ${getCurrentVideo()?.title}")
+        val playlist = getCurrentPlaylist()
+        if (playlist.isEmpty()) return null
+        currentIndex = (currentIndex + 1) % playlist.size
+        Log.d(TAG, "Switched to next video in ${playlistMode} mode: ${getCurrentVideo()?.title}")
         return getCurrentVideo()
     }
     
     fun getPreviousVideo(): VideoSource? {
-        if (videoList.isEmpty()) return null
+        val playlist = getCurrentPlaylist()
+        if (playlist.isEmpty()) return null
         currentIndex = if (currentIndex - 1 < 0) {
-            videoList.size - 1
+            playlist.size - 1
         } else {
             currentIndex - 1
         }
-        Log.d(TAG, "Switched to previous video: ${getCurrentVideo()?.title}")
+        Log.d(TAG, "Switched to previous video in ${playlistMode} mode: ${getCurrentVideo()?.title}")
         return getCurrentVideo()
     }
     
     fun getVideoCount(): Int = videoList.size
     
     fun getAllVideos(): List<VideoSource> = videoList.toList()
+    
+    // 收藏相关方法
+    fun toggleFavorite(video: VideoSource): Boolean {
+        return favoriteManager.toggleFavorite(video)
+    }
+    
+    fun isFavorite(video: VideoSource): Boolean {
+        return favoriteManager.isFavorite(video)
+    }
+    
+    fun getFavoriteCount(): Int {
+        return favoriteManager.getFavoriteCount()
+    }
+    
+    // 列表模式相关方法
+    fun switchPlaylistMode(): PlaylistMode {
+        playlistMode = if (playlistMode == PlaylistMode.ALL) {
+            PlaylistMode.FAVORITE
+        } else {
+            PlaylistMode.ALL
+        }
+        currentIndex = 0
+        Log.d(TAG, "Switched to playlist mode: $playlistMode")
+        return playlistMode
+    }
+    
+    fun getPlaylistMode(): PlaylistMode {
+        return playlistMode
+    }
+    
+    fun setPlaylistMode(mode: PlaylistMode) {
+        playlistMode = mode
+        currentIndex = 0
+        Log.d(TAG, "Set playlist mode to: $playlistMode")
+    }
+    
+    fun getPlaylistSize(): Int {
+        return getCurrentPlaylist().size
+    }
+    
+    fun getCurrentIndex(): Int {
+        return currentIndex
+    }
 }
